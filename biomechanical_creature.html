@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Biomechanical Creature Simulation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #0a0a0a;
+            font-family: 'Courier New', monospace;
+            cursor: crosshair;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: #00ff88;
+            font-size: 12px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #00ff88;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            color: #00ff88;
+            font-size: 11px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #00ff88;
+        }
+        
+        canvas {
+            display: block;
+            image-rendering: pixelated;
+        }
+        
+        .title {
+            color: #00ccff;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <div class="title">🤖 BIOMECHANICAL CREATURE</div>
+        <div>Status: <span id="status">Initializing...</span></div>
+        <div>Segments: <span id="segments">0</span></div>
+        <div>Energy: <span id="energy">100%</span></div>
+        <div>Mouse: <span id="mousePos">0, 0</span></div>
+    </div>
+    
+    <div id="controls">
+        <div class="title">CONTROLS</div>
+        <div>🖱️ Move mouse to guide creature</div>
+        <div>🔄 Refresh page for new creature</div>
+        <div>⚡ Lifelike physics & breathing</div>
+    </div>
+    
+    <script src="biomechanical_creature.js"></script>
+    
+    <script>
+        // UI Updates
+        function updateUI() {
+            const statusEl = document.getElementById('status');
+            const segmentsEl = document.getElementById('segments');
+            const energyEl = document.getElementById('energy');
+            const mousePosEl = document.getElementById('mousePos');
+            
+            if (typeof critter !== 'undefined') {
+                statusEl.textContent = 'Active & Breathing';
+                segmentsEl.textContent = segmentCount;
+                energyEl.textContent = Math.round(critter.energy * 100) + '%';
+            } else {
+                statusEl.textContent = 'Loading...';
+            }
+            
+            mousePosEl.textContent = `${Input.mouse.x}, ${Input.mouse.y}`;
+        }
+        
+        // Update UI every frame
+        setInterval(updateUI, 100);
+        
+        // Add some visual flair
+        document.addEventListener('mousemove', function(e) {
+            const info = document.getElementById('info');
+            const controls = document.getElementById('controls');
+            
+            // Subtle glow effect on UI elements when mouse is near
+            const infoRect = info.getBoundingClientRect();
+            const controlsRect = controls.getBoundingClientRect();
+            
+            const distToInfo = Math.sqrt(
+                Math.pow(e.clientX - (infoRect.left + infoRect.width/2), 2) + 
+                Math.pow(e.clientY - (infoRect.top + infoRect.height/2), 2)
+            );
+            
+            const distToControls = Math.sqrt(
+                Math.pow(e.clientX - (controlsRect.left + controlsRect.width/2), 2) + 
+                Math.pow(e.clientY - (controlsRect.top + controlsRect.height/2), 2)
+            );
+            
+            if (distToInfo < 100) {
+                info.style.boxShadow = `0 0 ${20 - distToInfo/5}px #00ff88`;
+            } else {
+                info.style.boxShadow = 'none';
+            }
+            
+            if (distToControls < 100) {
+                controls.style.boxShadow = `0 0 ${20 - distToControls/5}px #00ff88`;
+            } else {
+                controls.style.boxShadow = 'none';
+            }
+        });
+        
+        // Add particle effects on click
+        document.addEventListener('click', function(e) {
+            // Create temporary particle effect
+            for (let i = 0; i < 10; i++) {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.left = e.clientX + 'px';
+                particle.style.top = e.clientY + 'px';
+                particle.style.width = '4px';
+                particle.style.height = '4px';
+                particle.style.background = '#ff4444';
+                particle.style.borderRadius = '50%';
+                particle.style.pointerEvents = 'none';
+                particle.style.zIndex = '999';
+                document.body.appendChild(particle);
+                
+                const angle = (i / 10) * Math.PI * 2;
+                const speed = 50 + Math.random() * 100;
+                
+                let x = e.clientX;
+                let y = e.clientY;
+                let vx = Math.cos(angle) * speed;
+                let vy = Math.sin(angle) * speed;
+                let life = 1;
+                
+                function animateParticle() {
+                    x += vx * 0.05;
+                    y += vy * 0.05;
+                    vy += 2; // gravity
+                    life -= 0.02;
+                    
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    particle.style.opacity = life;
+                    
+                    if (life > 0) {
+                        requestAnimationFrame(animateParticle);
+                    } else {
+                        document.body.removeChild(particle);
+                    }
+                }
+                
+                animateParticle();
+            }
+        });
+        
+        console.log('🤖 Enhanced Biomechanical Creature Loaded');
+        console.log('Features: Breathing, Heartbeat, Realistic Physics, Gait Animation');
+    </script>
+</body>
+</html>
